@@ -29,14 +29,15 @@ tweet_count=0
 class Twitter2RaspberryPi(TwythonStreamer):
   def on_success(self, data):
     global tweet_count
-    new_count=tweet_count
     print("new_count", new_count)
     print "on success"
     if 'text' in data:
       print data['text'].encode('utf-8')
-      new_count+=1
+      tweet_count += 1
       GPIO.output(12, GPIO.HIGH)
-    tweet_count=new_count
+      if (tweet_count == 10): 
+        ss.move_servo()
+        tweet_count = 0
     print("tweet_count", tweet_count)
 
 # Create streamer

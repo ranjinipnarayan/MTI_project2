@@ -22,8 +22,8 @@ OAUTH_TOKEN = '3068198086-JkCcZtjOXtSM7iWqbZ4c0bmzjcu19KUoxdtMZcF'
 OAUTH_TOKEN_SECRET = 'O9R97AXTqWbUqa8ANb8HMJQ4yylxowhcKeJXtgIPGpLov'
 
 class ServoSix:
-  #servo_min = 500
-  #servo_max = 2500
+  servo_min = 500
+  servo_max = 2500
     
   def __init__(self, servo_min=500, servo_max=2500):
     self.servo_min = servo_min
@@ -61,13 +61,13 @@ class ServoSix:
     # disable it so it doesn't start after reboot'
     os.system("sudo update-rc.d servoblaster disable")  
         
-class App:
-  def __init__(self, master):
-    frame = Frame(master)
-    frame.pack()
-    scale = Scale(frame, from_=0, to=180,
-        orient=HORIZONTAL, command=self.update)
-    scale.grid(row=0)
+# class App:
+#   def __init__(self, master):
+#     frame = Frame(master)
+#     frame.pack()
+#     scale = Scale(frame, from_=0, to=180,
+#         orient=HORIZONTAL, command=self.update)
+#     scale.grid(row=0)
       
   def update(self, angle):
     duty = float(angle) / 10.0 + 2.5
@@ -78,24 +78,17 @@ class Twitter2RaspberryPi(TwythonStreamer):
   def on_success(self, data):
     print "on success"
     if 'text' in data:
-      if 'immigration' in data:
-        print data['text'].encode('utf-8')
-        ss.move_servo(ss.current_angle, 50, 10)
-      elif 'prochoice' in data or 'prolife' in data: 
-        print data['text'].encode('utf-8')
+      # if 'immigration' in data:
+      #   print data['text'].encode('utf-8')
+      #   ss.move_servo(ss.current_angle, 50, 10)
+      # elif 'prochoice' in data or 'prolife' in data: 
+      #   print data['text'].encode('utf-8')
         ss.move_servo(ss.current_angle, 100, 10)
+        delay(100)
 
 
   def on_error(self, status_code, data):
     print status_code, data
-
-root = Tk()
-root.wm_title('Servo Control')
-app = App(root)
-root.geometry("200x50+0+0")
-root.mainloop()
-ss = ServoSix()
-
 # Create streamer
 try:
   ss.set_servo(0):
@@ -104,3 +97,12 @@ try:
 except KeyboardInterrupt:
   GPIO.cleanup()
   ss.cleanup()
+
+root = Tk()
+root.wm_title('Servo Control')
+app = App(root)
+root.geometry("200x50+0+0")
+root.mainloop()
+ss = ServoSix()
+
+
