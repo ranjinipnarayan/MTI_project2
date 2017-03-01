@@ -7,12 +7,12 @@ import time
 from twython import TwythonStreamer
 
 # Search terms
-TERMS = '#trump, #immigration'
+TERMS = 'trump immigration, trump women, trump prolife, trump prochoice, trump tech, trump technology'
 
 # Twitter application authentication
-APP_KEY = 'GGjGahZ56kjEBLVXAUdllUWrO'
-APP_SECRET = 'ksh52EBiJpxMv2ErSjlzwvlvwZsDQR6Zmo3PxZhjbNlC7CZpQL'
-OAUTH_TOKEN = '3068198086-JkCcZtjOXtSM7iWqbZ4c0bmzjcu19KUoxdtMZcF'
+APP_KEY = 'JWzhZh1MUcH9Mb1H8aVK7u4la'
+APP_SECRET = 'Ren3pSknHTmv7jSypiL6Ge9ESsY0rTovE0gJvWJoU0FJjwhSXw'
+OAUTH_TOKEN =  '3068198086-JkCcZtjOXtSM7iWqbZ4c0bmzjcu19KUoxdtMZcF'
 OAUTH_TOKEN_SECRET = 'O9R97AXTqWbUqa8ANb8HMJQ4yylxowhcKeJXtgIPGpLov'
 
 
@@ -31,77 +31,70 @@ pwm = Adafruit_PCA9685.PCA9685()
 
 # Configure min and max servo pulse lengths
 servo_min = 150  # Min pulse length out of 4096
-servo_immigration = 600  # Max pulse length out of 4096
-servo_women = 500 
-servo_tech = 400
+servo_immigration = 1000 # Max pulse length out of 4096
+servo_women = 2000
+servo_tech = 3000
+
+# Helper function to make setting a servo pulse width simpler.
+def set_servo_pulse(self, channel, pulse):
+  pulse_length = 1000000    # 1,000,000 us per second
+  pulse_length //= 60       # 60 Hz
+  print('{0}us per period'.format(pulse_length))
+  pulse_length //= 4096     # 12 bits of resolution
+  print('{0}us per bit'.format(pulse_length))
+  pulse *= 1000
+  pulse //= pulse_length
+  pwm.set_pwm(channel, 0, pulse)
+  # Set frequency to 60hz, good for servos.
+  pwm.set_pwm_freq(60)
 
 class Servo(object): 
-
-  # Helper function to make setting a servo pulse width simpler.
-  def set_servo_pulse(channel, pulse):
-    pulse_length = 1000000    # 1,000,000 us per second
-    pulse_length //= 60       # 60 Hz
-    print('{0}us per period'.format(pulse_length))
-    pulse_length //= 4096     # 12 bits of resolution
-    print('{0}us per bit'.format(pulse_length))
-    pulse *= 1000
-    pulse //= pulse_length
-    pwm.set_pwm(channel, 0, pulse)
-    # Set frequency to 60hz, good for servos.
-    pwm.set_pwm_freq(60)
-
-  #print('Moving servo on channel 0, press Ctrl-C to quit...')
-  def move_servo(channel) 
+  def move_servo(self, channel): 
     if (channel == 0):
     # Move servo on channel O between extremes.
         pwm.set_pwm(0, 0, servo_immigration)
         time.sleep(1)
         pwm.set_pwm(0, 0, servo_min)
-        time.sleep(1)
     elif (channel == 1):
         pwm.set_pwm(0, 0, servo_women)
         time.sleep(1)
         pwm.set_pwm(0, 0, servo_min)
-        time.sleep(1)
     else: 
         pwm.set_pwm(0, 0, servo_tech)
         time.sleep(1)
         pwm.set_pwm(0, 0, servo_min)
-        time.sleep(1)
 
 
+servo = Servo()
 
 class Twitter2RaspberryPi(TwythonStreamer):
   def on_success(self, data):
     print "on success"
     if 'text' in data:
-      print "hello"
       text_body = data['text']
-      print text_body
       if 'immigration' in text_body or 'immigrants' in text_body:
+        print "IMMIGRATION"
         print data['text'].encode('utf-8')
-        print "immigration"
         servo.move_servo(0)
+        time.sleep(0.5)
       if 'women' in text_body or 'prolife' in text_body:
+        print "WOMEN"
         print data['text'].encode('utf-8')
-        print "women"
         servo.move_servo(1)
-      elif 'technology' in text_body or 'tech' in text_body:
+        time.sleep(0.5)
+      if 'technology' in text_body or 'tech' in text_body:
+        print "TECH"
         print data['text'].encode('utf-8')
-        print "tech"
-        servo.move_servo(1)
+        servo.move_servo(2)
+        time.sleep(0.5)
 
   def on_error(self, status_code, data):
     print status_code, data
 
-
-servo = Servo()
-
 # Create streamer
 try:
-  servo.set_servo_pulse() 
+  #servo.set_servo_pulse() 
   stream = Twitter2RaspberryPi(APP_KEY, APP_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
   stream.statuses.filter(track=TERMS)
 except KeyboardInterrupt:
-  GPIO.cleanup()
-  ss.cleanup()
+  print "we out"
