@@ -5,6 +5,7 @@
 from __future__ import division
 import time
 from twython import TwythonStreamer
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer as SIA
 
 # Search terms
 TERMS = 'trump immigration, trump women, trump prolife, trump prochoice, trump tech, trump technology'
@@ -34,6 +35,8 @@ servo_min = 150  # Min pulse length out of 4096
 servo_immigration = 1000 # Max pulse length out of 4096
 servo_women = 2000
 servo_tech = 3000
+
+sid = SIA()
 
 # Helper function to make setting a servo pulse width simpler.
 def set_servo_pulse(self, channel, pulse):
@@ -72,21 +75,25 @@ class Twitter2RaspberryPi(TwythonStreamer):
     print "on success"
     if 'text' in data:
       text_body = data['text']
+      ss = sid.polarity_scores(text_body)
       if 'immigration' in text_body or 'immigrants' in text_body:
-        print "IMMIGRATION"
-        print data['text'].encode('utf-8')
-        servo.move_servo(0)
-        time.sleep(0.5)
+        if (ss["compound"] < 0):
+          print "IMMIGRATION"
+          print data['text'].encode('utf-8')
+          servo.move_servo(0)
+          time.sleep(0.5)
       if 'women' in text_body or 'prolife' in text_body:
-        print "WOMEN"
-        print data['text'].encode('utf-8')
-        servo.move_servo(1)
-        time.sleep(0.5)
+        if (ss["compound"] < 0):
+          print "WOMEN"
+          print data['text'].encode('utf-8')
+          servo.move_servo(1)
+          time.sleep(0.5)
       if 'technology' in text_body or 'tech' in text_body:
-        print "TECH"
-        print data['text'].encode('utf-8')
-        servo.move_servo(2)
-        time.sleep(0.5)
+        if (ss["compound"] < 0):
+          print "TECH"
+          print data['text'].encode('utf-8')
+          servo.move_servo(1)
+          time.sleep(0.5)
 
   def on_error(self, status_code, data):
     print status_code, data
