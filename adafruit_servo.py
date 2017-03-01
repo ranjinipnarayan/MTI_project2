@@ -11,11 +11,10 @@ from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer as SIA
 TERMS = 'trump immigration, trump women, trump prolife, trump prochoice, trump tech, trump technology'
 
 # Twitter application authentication
-APP_KEY = 'JWzhZh1MUcH9Mb1H8aVK7u4la'
-APP_SECRET = 'Ren3pSknHTmv7jSypiL6Ge9ESsY0rTovE0gJvWJoU0FJjwhSXw'
+APP_KEY = 'tGfkAIfmPlcobqqaVkVPhBj4X'
+APP_SECRET = '9c8hWYd5ZjzTjyTPNjqk0PXXOvf39oHqDWkAj5Q4lMDFEcsNAZ'
 OAUTH_TOKEN =  '3068198086-JkCcZtjOXtSM7iWqbZ4c0bmzjcu19KUoxdtMZcF'
 OAUTH_TOKEN_SECRET = 'O9R97AXTqWbUqa8ANb8HMJQ4yylxowhcKeJXtgIPGpLov'
-
 
 # Import the PCA9685 module.
 import Adafruit_PCA9685
@@ -56,15 +55,15 @@ class Servo(object):
     if (channel == 0):
     # Move servo on channel O between extremes.
         pwm.set_pwm(0, 0, servo_immigration)
-        time.sleep(1)
+        time.sleep(3)
         pwm.set_pwm(0, 0, servo_min)
     elif (channel == 1):
         pwm.set_pwm(0, 0, servo_women)
-        time.sleep(1)
+        time.sleep(3)
         pwm.set_pwm(0, 0, servo_min)
     else: 
         pwm.set_pwm(0, 0, servo_tech)
-        time.sleep(1)
+        time.sleep(3)
         pwm.set_pwm(0, 0, servo_min)
 
 
@@ -72,28 +71,25 @@ servo = Servo()
 
 class Twitter2RaspberryPi(TwythonStreamer):
   def on_success(self, data):
-    print "on success"
     if 'text' in data:
       text_body = data['text']
       ss = sid.polarity_scores(text_body)
-      if 'immigration' in text_body or 'immigrants' in text_body:
-        if (ss["compound"] < 0):
-          print "IMMIGRATION"
-          print data['text'].encode('utf-8')
-          servo.move_servo(0)
-          time.sleep(0.5)
-      if 'women' in text_body or 'prolife' in text_body:
-        if (ss["compound"] < 0):
-          print "WOMEN"
-          print data['text'].encode('utf-8')
-          servo.move_servo(1)
-          time.sleep(0.5)
-      if 'technology' in text_body or 'tech' in text_body:
-        if (ss["compound"] < 0):
-          print "TECH"
-          print data['text'].encode('utf-8')
-          servo.move_servo(1)
-          time.sleep(0.5)
+      if (ss["compound"] < -0.5):
+        if 'immigration' in text_body or 'immigrants' in text_body:
+            print "IMMIGRATION"
+            print data['text'].encode('utf-8')
+            servo.move_servo(0)
+            time.sleep(0.5)
+        if 'women' in text_body or 'prolife' in text_body:
+            print "WOMEN"
+            print data['text'].encode('utf-8')
+            servo.move_servo(1)
+            time.sleep(0.5)
+        if 'technology' in text_body or 'tech' in text_body:
+            print "TECH"
+            print data['text'].encode('utf-8')
+            servo.move_servo(1)
+            time.sleep(0.5)
 
   def on_error(self, status_code, data):
     print status_code, data
