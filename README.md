@@ -6,17 +6,17 @@ We built at projector that is dependent on a twitter stream. We tracked certain 
 * Create an app on Twitter and generate the necessary access tokens and keys
 * Clone the Arduino repository 
 * Run the following commands
-  ~~~~
-  sudo apt-get install python-pip 
-  sudo pip install twython 
-  sudo pip install twython --updgrade 
-  ~~~~
+~~~~
+sudo apt-get install python-pip 
+sudo pip install twython 
+sudo pip install twython --updgrade 
+~~~~
 * Download the servo+twitter.py file and put in your access tokens 
 * Attach the servo hat to your raspberry pi and plug the servo in to the first pins 
 * Run the code using 
-  ~~~~
-  sudo python servo+twitter.py 
-  ~~~~
+~~~~
+sudo python servo+twitter.py 
+~~~~
 * Download the DXF file, laser cut it out of wood and assemble it. 
 * Put the system together and run it. 
 
