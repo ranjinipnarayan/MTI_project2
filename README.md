@@ -4,7 +4,7 @@ We built at projector that is dependent on a twitter stream. We tracked certain 
 
 **Building the projector** 
 * Create an app on Twitter and generate the necessary access tokens and keys
-* Clone the Arduino repository 
+* Clone the Adafruit Servo repository
 * Run the following commands
 ~~~~
 sudo apt-get install python-pip 
